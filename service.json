@@ -1,11 +1,14 @@
 {
     "id": "osmium-lacrm",
     "name": "Less Annoying CRM",
-    "version": "0.2.1",
+    "version": "0.3.0",
     "description": "Connects the site to Less Annoying CRM: a configurable API connection, a signed webhook receiver, and a local copy of calendar events. Other services use it through hooks, so it needs none of them and none of them are needed by it",
     "category": "business",
     "website": "https://www.lessannoyingcrm.com",
-    "account": {"required": "paid", "note": "Needs a Less Annoying CRM account and an API key."},
+    "account": {
+        "required": "paid",
+        "note": "Needs a Less Annoying CRM account and an API key."
+    },
     "author": {
         "name": "Gavin Cox"
     },
@@ -20,11 +23,24 @@
     ],
     "migrations": "migrations/",
     "hooks": {
-        "lacrm.contact.get": ["Osmium\\Services\\Lacrm\\Models\\LacrmLookup::contact"],
-        "lacrm.contacts.get_many": ["Osmium\\Services\\Lacrm\\Models\\LacrmLookup::contacts"],
-        "lacrm.contact.linked_people": ["Osmium\\Services\\Lacrm\\Models\\LacrmLookup::linkedPeople"],
-        "lacrm.sales.won": ["Osmium\\Services\\Lacrm\\Models\\LacrmLookup::wonContacts"],
-        "lacrm.sales.lost": ["Osmium\\Services\\Lacrm\\Models\\LacrmLookup::lostContacts"]
+        "lacrm.contact.get": [
+            "Osmium\\Services\\Lacrm\\Models\\LacrmLookup::contact"
+        ],
+        "lacrm.contacts.get_many": [
+            "Osmium\\Services\\Lacrm\\Models\\LacrmLookup::contacts"
+        ],
+        "lacrm.contact.linked_people": [
+            "Osmium\\Services\\Lacrm\\Models\\LacrmLookup::linkedPeople"
+        ],
+        "lacrm.sales.won": [
+            "Osmium\\Services\\Lacrm\\Models\\LacrmLookup::wonContacts"
+        ],
+        "lacrm.sales.lost": [
+            "Osmium\\Services\\Lacrm\\Models\\LacrmLookup::lostContacts"
+        ],
+        "dashboard.widgets": [
+            "Osmium\\Services\\Lacrm\\Models\\LacrmDashboard::widget"
+        ]
     },
     "admin": {
         "menu": {
@@ -37,6 +53,14 @@
                     "route": "admin/settings/lacrm",
                     "activePattern": "admin/settings/lacrm*",
                     "role": null
+                },
+                {
+                    "id": "lacrm-events",
+                    "label": "LACRM Calendar",
+                    "icon": "bx bx-calendar",
+                    "route": "admin/lacrm/events",
+                    "activePattern": "admin/lacrm/events*",
+                    "role": null
                 }
             ]
         },
@@ -46,6 +70,17 @@
                 "class": "Osmium\\Services\\Lacrm\\Controllers\\LacrmController",
                 "method": "index",
                 "title": "Less Annoying CRM"
+            },
+            "admin/lacrm/events": {
+                "controller": "controllers/LacrmEventsController.php",
+                "class": "Osmium\\Services\\Lacrm\\Controllers\\LacrmEventsController",
+                "method": "index",
+                "title": "LACRM Calendar Events"
+            },
+            "admin/lacrm/events/action": {
+                "controller": "controllers/LacrmEventsController.php",
+                "class": "Osmium\\Services\\Lacrm\\Controllers\\LacrmEventsController",
+                "method": "action"
             }
         }
     },
@@ -53,7 +88,9 @@
         "routes": {
             "api/lacrm-webhook": "controllers/webhook.php"
         },
-        "external": ["api/lacrm-webhook"]
+        "external": [
+            "api/lacrm-webhook"
+        ]
     },
     "setup": {
         "postInstallNote": "Off until configured. Enter your LACRM API key on the Less Annoying CRM settings page, press Test connection, then Register webhooks (the site must be reachable over HTTPS). Optionally enter the pipeline and the Won / Lost status IDs so the service announces sales; press List pipelines to see them. This service only connects and announces: other services listen for the lacrm.* hooks (lacrm.form.submitted, lacrm.sale.won, lacrm.sale.lost, lacrm.contact.updated, lacrm.event.saved, lacrm.event.deleted) and ask it questions through lacrm.contact.get and friends."

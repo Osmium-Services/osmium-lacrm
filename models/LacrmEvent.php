@@ -78,6 +78,31 @@ class LacrmEvent extends Model
     }
 
     /**
+     * Events that overlap the two days (YYYY-MM-DD, both included), soonest first.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    public function between(string $startDay, string $endDay): array
+    {
+        $bindings = [':range_start' => $startDay . ' 00:00:00', ':range_end' => $endDay . ' 23:59:59'];
+
+        return $this->database->prepare(sql: $this->loadSqlFile('event-list-between.sql'), bindings: $bindings)->resultset();
+    }
+
+    /** @return array<string, true> LACRM event ids already held (a set, keyed by id) */
+    public function knownIds(): array
+    {
+        $rows = $this->database->prepare(sql: $this->loadSqlFile('event-known-ids.sql'), bindings: [])->resultset();
+
+        $known = [];
+        foreach ($rows as $row) {
+            $known[(string) $row['lacrm_event_id']] = true;
+        }
+
+        return $known;
+    }
+
+    /**
      * @param array<string, mixed> $data
      * @return array<string, mixed>
      */
