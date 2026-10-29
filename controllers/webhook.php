@@ -67,6 +67,12 @@ $hooks = new ServiceHooks(new ServiceLoader(new ServiceModel($db)));
 $triggering = (string) ($payload['TriggeringEvent'] ?? '');
 $announcements = LacrmWebhook::announcements(payload: $payload, config: $config);
 
+$formSkipped = $triggering === 'PublicForm.Submit' && $announcements === [] && ($config['formId'] ?? '') !== '';
+if ($formSkipped) {
+    $seen = LacrmWebhook::formId(payload: $payload);
+    \error_log("LACRM webhook: form submission not announced. Form ID in settings is '{$config['formId']}', the submission's is '" . ($seen === '' ? 'not found in payload' : $seen) . "'");
+}
+
 $isEventSave = \in_array($triggering, ['Event.Create', 'Event.Update'], true);
 $isEventDelete = $triggering === 'Event.Delete';
 $event = $payload['Event'] ?? [];
