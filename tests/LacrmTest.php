@@ -6,13 +6,11 @@ namespace Tests\Services\Lacrm;
 
 use Osmium\Services\Lacrm\Models\LacrmClient;
 use Osmium\Services\Lacrm\Models\LacrmConfig;
-use Osmium\Services\Lacrm\Models\LacrmEventMapper;
 use Osmium\Services\Lacrm\Models\LacrmWebhook;
 use PHPUnit\Framework\TestCase;
 
 require_once __DIR__ . '/../models/LacrmConfig.php';
 require_once __DIR__ . '/../models/LacrmClient.php';
-require_once __DIR__ . '/../models/LacrmEventMapper.php';
 require_once __DIR__ . '/../models/LacrmWebhook.php';
 
 final class LacrmTest extends TestCase
@@ -173,41 +171,10 @@ final class LacrmTest extends TestCase
         $this->assertSame([], LacrmWebhook::announcements(payload: $without, config: []));
     }
 
-    public function test_unknown_events_and_calendar_events_are_left_to_the_controller(): void
+    public function test_unknown_events_are_not_announced(): void
     {
-        $this->assertSame([], LacrmWebhook::announcements(payload: ['TriggeringEvent' => 'Event.Create'], config: []));
         $this->assertSame([], LacrmWebhook::announcements(payload: ['TriggeringEvent' => 'Something.Else'], config: []));
         $this->assertSame([], LacrmWebhook::announcements(payload: [], config: []));
-    }
-
-    // Event mapping
-
-    public function test_an_event_maps_to_the_table_columns(): void
-    {
-        $row = LacrmEventMapper::map(event: [
-            'EventId' => 'e1',
-            'Name' => '  Show  ',
-            'StartDate' => '2026-11-01T09:00:00+00:00',
-            'EndDate' => '2026-11-01T17:00:00+00:00',
-            'IsAllDay' => false,
-            'UserIds' => 'u1',
-            'ContactIds' => ['c1', 'c2'],
-            'RecurrenceRule' => 'FREQ=WEEKLY',
-        ]);
-
-        $this->assertSame('e1', $row['lacrm_event_id']);
-        $this->assertSame('Show', $row['name']);
-        $this->assertSame(1, $row['is_recurring']);
-        $this->assertSame(['u1'], $row['lacrm_user_ids']);
-        $this->assertSame(['c1', 'c2'], $row['lacrm_contact_ids']);
-        $this->assertNull($row['attendees']);
-    }
-
-    public function test_a_missing_end_date_falls_back_to_the_start(): void
-    {
-        $row = LacrmEventMapper::map(event: ['EventId' => 'e1', 'StartDate' => '2026-11-01T09:00:00+00:00']);
-
-        $this->assertSame($row['start_date'], $row['end_date']);
     }
 
     // API response decoding

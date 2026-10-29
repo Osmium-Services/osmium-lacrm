@@ -114,36 +114,6 @@ class LacrmClient
         ], maxPages: 10);
     }
 
-    // Calendar events
-
-    public function getEvent(string $eventId): array
-    {
-        return $this->call(function: 'GetEvent', parameters: ['EventId' => $eventId]);
-    }
-
-    /** @return array<int, array> Events between two YYYY-MM-DD dates (either may be null) */
-    public function getEvents(?string $startDate = null, ?string $endDate = null): array
-    {
-        $parameters = \array_filter(['StartDate' => $startDate, 'EndDate' => $endDate]);
-
-        return $this->paged(function: 'GetEvents', parameters: $parameters, maxPages: self::MAX_PAGES);
-    }
-
-    /**
-     * @param string[] $eventIds
-     * @return array<string, array> Events keyed by EventId; ones that failed are left out
-     */
-    public function getEventsParallel(array $eventIds): array
-    {
-        $results = [];
-        foreach (\array_chunk($eventIds, self::BATCH_SIZE) as $batch) {
-            [$batchResults] = $this->fetchBatch(function: 'GetEvent', parameterName: 'EventId', ids: $batch);
-            $results += $batchResults;
-        }
-
-        return $results;
-    }
-
     // Connection
 
     /** @return array{success: bool, message: string, user?: array} */

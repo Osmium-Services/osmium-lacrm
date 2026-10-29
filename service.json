@@ -1,8 +1,8 @@
 {
     "id": "osmium-lacrm",
     "name": "Less Annoying CRM",
-    "version": "0.3.1",
-    "description": "Connects the site to Less Annoying CRM: a configurable API connection, a signed webhook receiver, and a local copy of calendar events. Other services use it through hooks, so it needs none of them and none of them are needed by it",
+    "version": "0.4.0",
+    "description": "Connects the site to Less Annoying CRM: a configurable API connection, and a signed webhook receiver. Other services use it through hooks, so it needs none of them and none of them are needed by it",
     "category": "business",
     "website": "https://www.lessannoyingcrm.com",
     "account": {
@@ -37,9 +37,6 @@
         ],
         "lacrm.sales.lost": [
             "Osmium\\Services\\Lacrm\\Models\\LacrmLookup::lostContacts"
-        ],
-        "dashboard.widgets": [
-            "Osmium\\Services\\Lacrm\\Models\\LacrmDashboard::widget"
         ]
     },
     "admin": {
@@ -53,14 +50,6 @@
                     "route": "admin/settings/lacrm",
                     "activePattern": "admin/settings/lacrm*",
                     "role": null
-                },
-                {
-                    "id": "lacrm-events",
-                    "label": "LACRM Calendar",
-                    "icon": "bx bx-calendar",
-                    "route": "admin/lacrm/events",
-                    "activePattern": "admin/lacrm/events*",
-                    "role": null
                 }
             ]
         },
@@ -70,17 +59,6 @@
                 "class": "Osmium\\Services\\Lacrm\\Controllers\\LacrmController",
                 "method": "index",
                 "title": "Less Annoying CRM"
-            },
-            "admin/lacrm/events": {
-                "controller": "controllers/LacrmEventsController.php",
-                "class": "Osmium\\Services\\Lacrm\\Controllers\\LacrmEventsController",
-                "method": "index",
-                "title": "LACRM Calendar Events"
-            },
-            "admin/lacrm/events/action": {
-                "controller": "controllers/LacrmEventsController.php",
-                "class": "Osmium\\Services\\Lacrm\\Controllers\\LacrmEventsController",
-                "method": "action"
             }
         }
     },

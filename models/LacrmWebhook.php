@@ -16,9 +16,6 @@ class LacrmWebhook
         'PipelineItemStatus.Create',
         'PipelineItemStatus.Update',
         'Contact.Update',
-        'Event.Create',
-        'Event.Update',
-        'Event.Delete',
     ];
 
     /** How long after pressing Register webhooks the handshake secret is accepted. */
@@ -43,8 +40,7 @@ class LacrmWebhook
     }
 
     /**
-     * The hooks to announce for a payload. Calendar events are not here: they
-     * are stored first (see webhook.php), then announced.
+     * The hooks to announce for a payload.
      *
      * @param array<string, mixed> $payload
      * @param array<string, mixed> $config

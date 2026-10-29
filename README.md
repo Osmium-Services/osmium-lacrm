@@ -6,7 +6,6 @@ It does three things and knows nothing about any other service:
 
 - **API connection** with a Test connection button and a List pipelines button.
 - **Webhook receiver** at `/api/lacrm-webhook/`, checked with LACRM's HMAC signature. Register webhooks saves the secret LACRM hands back, but only for five minutes after the button is pressed.
-- **Local copy of calendar events** in `lacrm_events`, kept current by the webhook (soft delete on removal).
 
 ## Hooks it fires (`dispatch`; payload always includes `dataSource`)
 
@@ -15,8 +14,6 @@ It does three things and knows nothing about any other service:
 | `lacrm.form.submitted` | `formId`, `fields`, `submission`, `raw` (the whole payload). A Form ID in settings limits it to that form |
 | `lacrm.sale.won`, `lacrm.sale.lost` | `contactId`, `item`. Only for the pipeline and Won/Lost status IDs set in settings; blank means never |
 | `lacrm.contact.updated` | `contacts` (the LACRM contact objects) |
-| `lacrm.event.saved` | `id`, `created`, `event` (the stored row) |
-| `lacrm.event.deleted` | `lacrmEventId`, `deleted` |
 
 ## Hooks it answers (`handle`; null when the connection is off)
 

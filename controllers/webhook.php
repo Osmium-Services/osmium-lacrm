@@ -4,16 +4,14 @@ use Osmium\Core\Library\ServiceHooks;
 use Osmium\Core\Library\ServiceLoader;
 use Osmium\Core\Models\ServiceModel;
 use Osmium\Services\Lacrm\Models\LacrmConfig;
-use Osmium\Services\Lacrm\Models\LacrmEvent;
-use Osmium\Services\Lacrm\Models\LacrmEventMapper;
 use Osmium\Services\Lacrm\Models\LacrmWebhook;
 
 /**
  * Receives Less Annoying CRM webhooks (POST /api/lacrm-webhook/).
  *
- * Calendar events are stored in lacrm_events. Everything else is only
- * announced as a lacrm.* hook, so this service never touches another
- * service's data. Every hook is announced after the payload is verified.
+ * Everything is only announced as a lacrm.* hook, so this service never
+ * touches another service's data. Every hook is announced after the payload
+ * is verified.
  *
  * Security: HMAC SHA-256 of the raw body in X-Hook-Signature, checked against
  * the saved webhook secret.
@@ -71,26 +69,6 @@ $formSkipped = $triggering === 'PublicForm.Submit' && $announcements === [] && (
 if ($formSkipped) {
     $seen = LacrmWebhook::formId(payload: $payload);
     \error_log("LACRM webhook: form submission not announced. Form ID in settings is '{$config['formId']}', the submission's is '" . ($seen === '' ? 'not found in payload' : $seen) . "'");
-}
-
-$isEventSave = \in_array($triggering, ['Event.Create', 'Event.Update'], true);
-$isEventDelete = $triggering === 'Event.Delete';
-$event = $payload['Event'] ?? [];
-$eventId = (string) ($event['EventId'] ?? '');
-
-if (($isEventSave || $isEventDelete) && $eventId === '') {
-    $respond(400, ['success' => false, 'error' => 'Missing EventId']);
-}
-
-if ($isEventSave) {
-    $row = LacrmEventMapper::map(event: $event, rawPayload: $payload);
-    $saved = (new LacrmEvent($db))->save(data: $row);
-    $announcements[] = ['event' => 'lacrm.event.saved', 'payload' => ['id' => $saved['id'], 'created' => $saved['created'], 'event' => $row]];
-}
-
-if ($isEventDelete) {
-    $deleted = (new LacrmEvent($db))->softDelete(lacrmEventId: $eventId);
-    $announcements[] = ['event' => 'lacrm.event.deleted', 'payload' => ['lacrmEventId' => $eventId, 'deleted' => $deleted]];
 }
 
 foreach ($announcements as $announcement) {
