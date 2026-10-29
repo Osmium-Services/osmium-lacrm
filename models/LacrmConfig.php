@@ -25,6 +25,7 @@ class LacrmConfig
             'userId' => '',
             'webhookSecret' => '',
             'handshakeOpenUntil' => 0,
+            'formId' => '',
             'pipelineId' => '',
             'wonStatusId' => '',
             'lostStatusId' => '',

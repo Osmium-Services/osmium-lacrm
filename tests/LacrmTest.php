@@ -113,6 +113,29 @@ final class LacrmTest extends TestCase
         $this->assertSame(['Email' => 'a@b.co'], $announced[0]['payload']['fields']);
     }
 
+    public function test_the_form_id_is_read_from_wherever_lacrm_puts_it(): void
+    {
+        $this->assertSame('f1', LacrmWebhook::formId(['PublicFormId' => 'f1']));
+        $this->assertSame('f2', LacrmWebhook::formId(['PublicFormMetaData' => ['PublicFormId' => 'f2']]));
+        $this->assertSame('f3', LacrmWebhook::formId(['FormSubmission' => ['PublicFormId' => 'f3']]));
+        $this->assertSame('', LacrmWebhook::formId(['TriggeringEvent' => 'PublicForm.Submit']));
+    }
+
+    public function test_a_set_form_id_announces_only_that_form_and_never_an_unreadable_one(): void
+    {
+        $mine = ['TriggeringEvent' => 'PublicForm.Submit', 'PublicFormId' => 'f1'];
+        $other = ['TriggeringEvent' => 'PublicForm.Submit', 'PublicFormId' => 'f9'];
+        $unknown = ['TriggeringEvent' => 'PublicForm.Submit'];
+        $config = ['formId' => 'f1'];
+
+        $announced = LacrmWebhook::announcements(payload: $mine, config: $config);
+
+        $this->assertSame('f1', $announced[0]['payload']['formId']);
+        $this->assertSame([], LacrmWebhook::announcements(payload: $other, config: $config));
+        $this->assertSame([], LacrmWebhook::announcements(payload: $unknown, config: $config));
+        $this->assertCount(1, LacrmWebhook::announcements(payload: $other, config: []));
+    }
+
     public function test_sales_are_announced_only_for_the_configured_pipeline_and_statuses(): void
     {
         $config = ['pipelineId' => 'P', 'wonStatusId' => 'W', 'lostStatusId' => 'L'];

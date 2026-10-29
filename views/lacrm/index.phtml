@@ -70,6 +70,20 @@
 
             <div class="card mb-4">
                 <div class="card-header">
+                    <h5 class="mb-0"><i class="bx bx-id-card me-2"></i>Form submissions</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label for="form_id" class="form-label fw-semibold">Form ID <span class="text-muted fw-normal">(optional)</span></label>
+                        <input type="text" class="form-control" id="form_id" name="form_id" autocomplete="off"
+                            value="<?= \htmlspecialchars((string) $lacrm['formId']) ?>">
+                        <div class="form-text">Leave blank and every LACRM public form is announced (lacrm.form.submitted). Enter one form's ID and only that form is.</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-header">
                     <h5 class="mb-0"><i class="bx bx-trending-up me-2"></i>Sales announcements</h5>
                 </div>
                 <div class="card-body">

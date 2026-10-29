@@ -12,7 +12,7 @@ It does three things and knows nothing about any other service:
 
 | Hook | Payload |
 |---|---|
-| `lacrm.form.submitted` | `fields`, `submission` (a LACRM public form) |
+| `lacrm.form.submitted` | `formId`, `fields`, `submission`, `raw` (the whole payload). A Form ID in settings limits it to that form |
 | `lacrm.sale.won`, `lacrm.sale.lost` | `contactId`, `item`. Only for the pipeline and Won/Lost status IDs set in settings; blank means never |
 | `lacrm.contact.updated` | `contacts` (the LACRM contact objects) |
 | `lacrm.event.saved` | `id`, `created`, `event` (the stored row) |

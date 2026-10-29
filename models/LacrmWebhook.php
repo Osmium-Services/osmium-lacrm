@@ -55,7 +55,7 @@ class LacrmWebhook
         $triggering = (string) ($payload['TriggeringEvent'] ?? '');
 
         return match ($triggering) {
-            'PublicForm.Submit' => self::formSubmitted(payload: $payload),
+            'PublicForm.Submit' => self::formSubmitted(payload: $payload, config: $config),
             'PipelineItemStatus.Create',
             'PipelineItemStatus.Update' => self::pipelineChanges(payload: $payload, config: $config),
             'Contact.Update' => self::contactUpdated(payload: $payload),
@@ -63,16 +63,47 @@ class LacrmWebhook
         };
     }
 
-    /** @return array<int, array{event: string, payload: array<string, mixed>}> */
-    private static function formSubmitted(array $payload): array
+    /**
+     * A form submission, announced with the form's ID. When a Form ID is set in
+     * settings only that form is announced; an unreadable ID is never assumed
+     * to match.
+     *
+     * @return array<int, array{event: string, payload: array<string, mixed>}>
+     */
+    private static function formSubmitted(array $payload, array $config): array
     {
+        $formId = self::formId(payload: $payload);
+        $wanted = (string) ($config['formId'] ?? '');
+
+        $filtered = $wanted !== '';
+        $otherForm = $filtered && $formId !== $wanted;
+        if ($otherForm) return [];
+
         $submission = $payload['FormSubmission'] ?? [];
         $fields = $submission['FormFields'] ?? [];
 
         return [[
             'event' => 'lacrm.form.submitted',
-            'payload' => ['fields' => $fields, 'submission' => $submission],
+            'payload' => ['formId' => $formId, 'fields' => $fields, 'submission' => $submission, 'raw' => $payload],
         ]];
+    }
+
+    /** The form's ID. LACRM's docs put it at PublicFormId, and in PublicFormMetaData; older payloads nest it in FormSubmission. */
+    public static function formId(array $payload): string
+    {
+        $candidates = [
+            $payload['PublicFormId'] ?? null,
+            $payload['PublicFormMetaData']['PublicFormId'] ?? null,
+            $payload['FormSubmission']['PublicFormId'] ?? null,
+            $payload['FormSubmission']['FormId'] ?? null,
+        ];
+
+        foreach ($candidates as $candidate) {
+            $usable = \is_scalar($candidate) && (string) $candidate !== '';
+            if ($usable) return (string) $candidate;
+        }
+
+        return '';
     }
 
     /** @return array<int, array{event: string, payload: array<string, mixed>}> */

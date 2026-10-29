@@ -68,6 +68,7 @@ class LacrmController extends AdminController
             'enabled' => isset($_POST['enabled']),
             'apiKey' => $apiKey,
             'userId' => \trim((string) ($_POST['user_id'] ?? '')),
+            'formId' => \trim((string) ($_POST['form_id'] ?? '')),
             'pipelineId' => \trim((string) ($_POST['pipeline_id'] ?? '')),
             'wonStatusId' => \trim((string) ($_POST['won_status_id'] ?? '')),
             'lostStatusId' => \trim((string) ($_POST['lost_status_id'] ?? '')),
@@ -89,10 +90,10 @@ class LacrmController extends AdminController
         $needsKey = $values['enabled'] && $values['apiKey'] === '';
         if ($needsKey) return 'Enter your LACRM API key to switch the connection on.';
 
-        foreach (['pipelineId', 'wonStatusId', 'lostStatusId', 'userId'] as $field) {
+        foreach (['formId', 'pipelineId', 'wonStatusId', 'lostStatusId', 'userId'] as $field) {
             $value = (string) $values[$field];
             $badId = $value !== '' && !LacrmConfig::isValidId($value);
-            if ($badId) return 'Pipeline, status and user IDs are letters, digits and dashes only.';
+            if ($badId) return 'Form, pipeline, status and user IDs are letters, digits and dashes only.';
         }
 
         return null;
