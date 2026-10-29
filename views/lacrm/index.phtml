@@ -1,0 +1,120 @@
+<div class="d-flex justify-content-between align-items-center py-3 mb-4">
+    <h4 class="mb-0">
+        <img src="/assets/services/osmium-lacrm/logo.png" alt="" width="28" height="28" class="me-2 align-text-bottom">Less Annoying CRM
+    </h4>
+    <button type="submit" form="settings-form" class="btn btn-primary">
+        <i class="bx bx-save me-1"></i> Save Settings
+    </button>
+</div>
+
+<?php if ($admin['settingsSaved']): ?>
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        Settings saved successfully!
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+<?php endif; ?>
+
+<?php if ($admin['settingsError']): ?>
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <?= \htmlspecialchars((string) $admin['settingsError']) ?>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+<?php endif; ?>
+
+<?php if ($admin['result']): ?>
+    <div class="alert alert-<?= $admin['result']['ok'] ? 'success' : 'danger' ?> alert-dismissible fade show" role="alert">
+        <strong><?= \htmlspecialchars($admin['result']['title']) ?></strong>
+        <?php if (!empty($admin['result']['pre'])): ?>
+            <pre class="mb-0 mt-2"><?= \htmlspecialchars($admin['result']['text']) ?></pre>
+        <?php else: ?>
+            : <?= \htmlspecialchars($admin['result']['text']) ?>
+        <?php endif; ?>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+<?php endif; ?>
+
+<?php $lacrm = $admin['config']['lacrm']; ?>
+
+<form method="POST" action="<?= $admin['basePath'] ?>settings/lacrm/" id="settings-form">
+    <input type="hidden" name="token" value="<?= $template['formToken'] ?? '' ?>">
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bx bx-key me-2"></i>Connection</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="enabled" name="enabled" <?= $lacrm['enabled'] ? 'checked' : '' ?>>
+                            <label class="form-check-label fw-semibold" for="enabled">Connect to Less Annoying CRM</label>
+                        </div>
+                        <div class="form-text">While off, the webhook address answers "not found" and other services get nothing back from their lookups.</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="api_key" class="form-label fw-semibold">API key</label>
+                        <input type="password" class="form-control" id="api_key" name="api_key" autocomplete="off"
+                            placeholder="<?= $lacrm['apiKeySet'] ? 'Saved - leave blank to keep' : 'Not set' ?>">
+                        <div class="form-text">In Less Annoying CRM: Settings > Programmer API.</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="user_id" class="form-label fw-semibold">User ID <span class="text-muted fw-normal">(optional)</span></label>
+                        <input type="text" class="form-control" id="user_id" name="user_id" autocomplete="off"
+                            value="<?= \htmlspecialchars((string) $lacrm['userId']) ?>">
+                        <div class="form-text">Used by Test connection. Leave blank to test as the API key's own user.</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bx bx-trending-up me-2"></i>Sales announcements</h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted">Leave all three blank and no sales are announced. Press List pipelines below to find the IDs.</p>
+                    <div class="mb-3">
+                        <label for="pipeline_id" class="form-label fw-semibold">Pipeline ID</label>
+                        <input type="text" class="form-control" id="pipeline_id" name="pipeline_id" autocomplete="off"
+                            value="<?= \htmlspecialchars((string) $lacrm['pipelineId']) ?>">
+                    </div>
+                    <div class="mb-3">
+                        <label for="won_status_id" class="form-label fw-semibold">Won status ID</label>
+                        <input type="text" class="form-control" id="won_status_id" name="won_status_id" autocomplete="off"
+                            value="<?= \htmlspecialchars((string) $lacrm['wonStatusId']) ?>">
+                        <div class="form-text">An item moving here is announced as a sale won (lacrm.sale.won).</div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="lost_status_id" class="form-label fw-semibold">Lost status ID</label>
+                        <input type="text" class="form-control" id="lost_status_id" name="lost_status_id" autocomplete="off"
+                            value="<?= \htmlspecialchars((string) $lacrm['lostStatusId']) ?>">
+                        <div class="form-text">An item moving here is announced as a sale lost (lacrm.sale.lost).</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+<div class="row justify-content-center">
+    <div class="col-lg-6">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bx bx-plug me-2"></i>Check and register</h5>
+            </div>
+            <div class="card-body">
+                <p class="mb-2">Webhook address: <code><?= \htmlspecialchars($admin['webhookUrl']) ?></code></p>
+                <p class="mb-3">Webhook secret: <?= $lacrm['webhookSecretSet'] ? '<span class="badge bg-success">saved</span>' : '<span class="badge bg-secondary">not saved</span>' ?></p>
+                <p class="form-text">These use the saved settings, so save first. Registering needs the site reachable over HTTPS and switched on above.</p>
+                <?php foreach (['test' => ['Test connection', 'bx-check-circle'], 'pipelines' => ['List pipelines', 'bx-list-ul'], 'register' => ['Register webhooks', 'bx-link']] as $action => [$label, $icon]): ?>
+                    <form method="POST" action="<?= $admin['basePath'] ?>settings/lacrm/" class="d-inline">
+                        <input type="hidden" name="token" value="<?= $template['formToken'] ?? '' ?>">
+                        <input type="hidden" name="action" value="<?= $action ?>">
+                        <button type="submit" class="btn btn-outline-primary"><i class="bx <?= $icon ?> me-1"></i> <?= $label ?></button>
+                    </form>
+                <?php endforeach; ?>
+            </div>
+        </div>
+    </div>
+</div>
