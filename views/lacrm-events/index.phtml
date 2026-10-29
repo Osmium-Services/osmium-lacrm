@@ -35,6 +35,13 @@ $listContext = [
             <label class="form-label" for="rangeEnd">To</label>
             <input type="date" class="form-control" id="rangeEnd" name="end" value="<?= \htmlspecialchars($admin['rangeEnd']) ?>">
         </div>
+        <div>
+            <label class="form-label" for="showFilter">Show</label>
+            <select class="form-select" id="showFilter" name="show">
+                <option value="">All events</option>
+                <option value="customers"<?= $admin['onlyCustomers'] ? ' selected' : '' ?>>Linked to a customer</option>
+            </select>
+        </div>
         <button type="submit" class="btn btn-outline-primary"><i class="bx bx-filter-alt me-1"></i> Show</button>
     </div>
 </form>

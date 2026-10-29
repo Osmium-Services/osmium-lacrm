@@ -34,10 +34,14 @@ class LacrmEventsController extends AdminController
         $events = (new LacrmEvent($this->osmium->dataSource))->between(startDay: $start, endDay: $end);
         $linked = $this->linkedCustomers($events);
 
+        $onlyCustomers = ($params['show'] ?? '') === 'customers';
+        if ($onlyCustomers) $events = LacrmEventDisplay::withCustomers(events: $events, customers: $linked);
+
         $this->data['admin']['lists'] = require __DIR__ . '/../lists/lacrm-events.php';
         $this->data['admin']['events'] = \array_map(fn(array $event): array => $this->formatEvent(event: $event, linked: $linked), $events);
         $this->data['admin']['rangeStart'] = $start;
         $this->data['admin']['rangeEnd'] = $end;
+        $this->data['admin']['onlyCustomers'] = $onlyCustomers;
         $this->data['admin']['isAdmin'] = $this->isAdmin();
         $this->data['admin']['connected'] = LacrmConfig::isReady(LacrmConfig::get());
 

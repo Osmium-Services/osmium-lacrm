@@ -82,6 +82,16 @@ final class LacrmEventsTest extends TestCase
         $this->assertSame([], LacrmEventDisplay::contactIds(['lacrm_contact_ids' => 'not json']));
     }
 
+    public function test_the_customer_filter_keeps_only_events_linked_to_a_customer(): void
+    {
+        $events = [['id' => 1, 'lacrm_contact_ids' => '["7","8"]'], ['id' => 2, 'lacrm_contact_ids' => '["9"]'], ['id' => 3, 'lacrm_contact_ids' => null]];
+
+        $kept = LacrmEventDisplay::withCustomers($events, ['8' => ['label' => 'Acme', 'url' => 'x']]);
+
+        $this->assertSame([1], \array_column($kept, 'id'));
+        $this->assertSame([], LacrmEventDisplay::withCustomers($events, []));
+    }
+
     public function test_the_date_range_defaults_to_today_until_year_end_and_is_put_the_right_way_round(): void
     {
         $today = new \DateTimeImmutable('2026-10-29');

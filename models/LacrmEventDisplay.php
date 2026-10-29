@@ -50,6 +50,20 @@ final class LacrmEventDisplay
     }
 
     /**
+     * Only the events with at least one linked contact that is a customer.
+     *
+     * @param array<int, array<string, mixed>> $events
+     * @param array<string, mixed> $customers Keyed by contact id (whatever answered the crm.contacts.linked hook)
+     * @return array<int, array<string, mixed>>
+     */
+    public static function withCustomers(array $events, array $customers): array
+    {
+        $kept = \array_filter($events, static fn(array $event): bool => \array_intersect(self::contactIds($event), \array_map('strval', \array_keys($customers))) !== []);
+
+        return \array_values($kept);
+    }
+
+    /**
      * The two days of a date filter, tidied; today to the end of the year when blank or unreadable, and swapped if backwards.
      *
      * @return array{0: string, 1: string}
