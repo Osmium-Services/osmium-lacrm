@@ -19,7 +19,7 @@ class LacrmWebhook
     ];
 
     /** How long after pressing Register webhooks the handshake secret is accepted. */
-    public const HANDSHAKE_WINDOW_SECONDS = 300;
+    public const HANDSHAKE_WINDOW_SECONDS = 30;
 
     public static function signatureValid(string $rawBody, string $signature, string $secret): bool
     {

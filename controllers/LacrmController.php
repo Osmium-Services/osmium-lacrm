@@ -124,6 +124,9 @@ class LacrmController extends AdminController
             $this->fail('Registering failed: ' . $e->getMessage());
         }
 
+        // LACRM sends the handshake while createWebhook is in flight, so the window can close now
+        LacrmConfig::save(['handshakeOpenUntil' => 0]);
+
         $captured = (string) LacrmConfig::get()['webhookSecret'] !== '';
         $text = $captured
             ? 'Webhook registered at ' . $url . ' and its secret saved.'
