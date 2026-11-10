@@ -1,7 +1,7 @@
 {
     "id": "osmium-lacrm",
     "name": "Less Annoying CRM",
-    "version": "0.4.1",
+    "version": "0.4.2",
     "description": "Connects the site to Less Annoying CRM: a configurable API connection, and a signed webhook receiver. Other services use it through hooks, so it needs none of them and none of them are needed by it",
     "category": "business",
     "website": "https://www.lessannoyingcrm.com",
